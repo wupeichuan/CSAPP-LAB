@@ -23,6 +23,35 @@ word_t ncopy(word_t *src, word_t *dst, word_t len)
     }
     return count;
 }
+word_t ncopy(word_t *src, word_t *dst, word_t len)
+{
+    word_t count = 0;
+    word_t val_1, val_2;
+    word_t limit = len - 1;
+
+    while (limit > 0) {
+        val_1 = *src;
+        val_2 = *(src + 1);
+        src = src + 2;
+        *dst = val_1;
+        *(dst + 1) = val_2;
+        dst = dst + 2;
+        if (val_1 > 0)
+            count++;
+        if (val_2 > 0)
+            count++;
+        limit = limit - 2;
+    }
+    len = limit + 1;
+    while(len > 0){
+        val_1 = *src++;
+        *dst++ = val_1;
+        if (val > 0)
+            count++;
+        len--;
+    }
+    return count;
+}
 /* $end ncopy */
 
 int main()

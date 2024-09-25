@@ -30,22 +30,51 @@ ncopy:
 # You can modify this portion
 	# Loop header
 	xorq %rax,%rax		# count = 0;
+	irmovq $-1, %r9
+	addq %r9, %rdx
+	irmovq $2, %r8
+	irmovq $16, %r9
 	andq %rdx,%rdx		# len <= 0?
-	jle Done		# if so, goto Done:
-
-Loop:	mrmovq (%rdi), %r10	# read val from src...
+	jle Done_1		# if so, goto Done:
+	
+Loop_1:	mrmovq (%rdi), %r10	# read val from src...
+	mrmovq 8(%rdi), %r11
 	rmmovq %r10, (%rsi)	# ...and store it to dst
-	andq %r10, %r10		# val <= 0?
-	jle Npos		# if so, goto Npos:
+	rmmovq %r11, 8(%rsi)	# ...and store it to dst
+	andq %r10, %r10		# val_1 <= 0?
+	jle Npos_1		# if so, goto Npos_1:
 	irmovq $1, %r10
 	addq %r10, %rax		# count++
-Npos:	irmovq $1, %r10
+Npos_1:	
+	andq %r11, %r11		# val_2 <= 0?
+	jle Npos_2		# if so, goto Npos_1:
+	irmovq $1, %r10
+	addq %r10, %rax
+Npos_2:
+	subq %r8, %rdx		# len--
+	addq %r9, %rdi		# src++
+	addq %r9, %rsi		# dst++
+	andq %rdx,%rdx		# len > 0?
+	jg Loop_1			# if so, goto Loop:
+Done_1:
+	irmovq $1, %r9
+	addq %r9, %rdx
+	andq %rdx, %rdx
+	jle Done
+Loop_2:	
+	mrmovq (%rdi), %r10	# read val from src...
+	rmmovq %r10, (%rsi)	# ...and store it to dst
+	andq %r10, %r10		# val <= 0?
+	jle Npos_3		# if so, goto Npos:
+	irmovq $1, %r10
+	addq %r10, %rax		# count++
+Npos_3:	irmovq $1, %r10
 	subq %r10, %rdx		# len--
 	irmovq $8, %r10
 	addq %r10, %rdi		# src++
 	addq %r10, %rsi		# dst++
 	andq %rdx,%rdx		# len > 0?
-	jg Loop			# if so, goto Loop:
+	jg Loop_2			# if so, goto Loop:
 ##################################################################
 # Do not modify the following section of code
 # Function epilogue.
@@ -63,8 +92,8 @@ EndFun:
 	.align 8
 src:
 	.quad 1
-	.quad -2
-	.quad 3
+	.quad 2
+	.quad -3
 	.quad -4
 	.quad 0xbcdefa # This shouldn't get moved
 
