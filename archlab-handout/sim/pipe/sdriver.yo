@@ -30,71 +30,63 @@
                             | # You can modify this portion
                             | 	# Loop header
 0x032: 6300                 | 	xorq %rax,%rax		# count = 0;
-0x034: 30f9ffffffffffffffff | 	irmovq $-1, %r9
-0x03e: 6092                 | 	addq %r9, %rdx
-0x040: 30f80200000000000000 | 	irmovq $2, %r8
-0x04a: 30f91000000000000000 | 	irmovq $16, %r9
-0x054: 6222                 | 	andq %rdx,%rdx		# len <= 0?
-0x056: 71c600000000000000   | 	jle Done_1		# if so, goto Done:
+0x034: c0f2ffffffffffffffff | 	iaddq $-1, %rdx
+0x03e: 6222                 | 	andq %rdx,%rdx		# len <= 0?
+0x040: 71c400000000000000   | 	jle Done_1		# if so, goto Done:
                             | 	
-0x05f: 50a70000000000000000 | Loop_1:	mrmovq (%rdi), %r10	# read val from src...
-0x069: 50b70800000000000000 | 	mrmovq 8(%rdi), %r11
-0x073: 40a60000000000000000 | 	rmmovq %r10, (%rsi)	# ...and store it to dst
-0x07d: 40b60800000000000000 | 	rmmovq %r11, 8(%rsi)	# ...and store it to dst
-0x087: 62aa                 | 	andq %r10, %r10		# val_1 <= 0?
-0x089: 719e00000000000000   | 	jle Npos_1		# if so, goto Npos_1:
-0x092: 30fa0100000000000000 | 	irmovq $1, %r10
-0x09c: 60a0                 | 	addq %r10, %rax		# count++
-0x09e:                      | Npos_1:	
-0x09e: 62bb                 | 	andq %r11, %r11		# val_2 <= 0?
-0x0a0: 71b500000000000000   | 	jle Npos_2		# if so, goto Npos_1:
-0x0a9: 30fa0100000000000000 | 	irmovq $1, %r10
-0x0b3: 60a0                 | 	addq %r10, %rax
-0x0b5:                      | Npos_2:
-0x0b5: 6182                 | 	subq %r8, %rdx		# len--
-0x0b7: 6097                 | 	addq %r9, %rdi		# src++
-0x0b9: 6096                 | 	addq %r9, %rsi		# dst++
-0x0bb: 6222                 | 	andq %rdx,%rdx		# len > 0?
-0x0bd: 765f00000000000000   | 	jg Loop_1			# if so, goto Loop:
-0x0c6:                      | Done_1:
-0x0c6: 30f90100000000000000 | 	irmovq $1, %r9
-0x0d0: 6092                 | 	addq %r9, %rdx
-0x0d2: 6222                 | 	andq %rdx, %rdx
-0x0d4: 712d01000000000000   | 	jle Done
-0x0dd:                      | Loop_2:	
-0x0dd: 50a70000000000000000 | 	mrmovq (%rdi), %r10	# read val from src...
-0x0e7: 40a60000000000000000 | 	rmmovq %r10, (%rsi)	# ...and store it to dst
-0x0f1: 62aa                 | 	andq %r10, %r10		# val <= 0?
-0x0f3: 710801000000000000   | 	jle Npos_3		# if so, goto Npos:
-0x0fc: 30fa0100000000000000 | 	irmovq $1, %r10
-0x106: 60a0                 | 	addq %r10, %rax		# count++
-0x108: 30fa0100000000000000 | Npos_3:	irmovq $1, %r10
-0x112: 61a2                 | 	subq %r10, %rdx		# len--
-0x114: 30fa0800000000000000 | 	irmovq $8, %r10
-0x11e: 60a7                 | 	addq %r10, %rdi		# src++
-0x120: 60a6                 | 	addq %r10, %rsi		# dst++
-0x122: 6222                 | 	andq %rdx,%rdx		# len > 0?
-0x124: 76dd00000000000000   | 	jg Loop_2			# if so, goto Loop:
+0x049: 50a70000000000000000 | Loop_1:	mrmovq (%rdi), %r10	# read val from src...
+0x053: 50b70800000000000000 | 	mrmovq 8(%rdi), %r11
+0x05d: 40a60000000000000000 | 	rmmovq %r10, (%rsi)	# ...and store it to dst
+0x067: 40b60800000000000000 | 	rmmovq %r11, 8(%rsi)	# ...and store it to dst
+0x071: 62aa                 | 	andq %r10, %r10		# val_1 <= 0?
+0x073: 718600000000000000   | 	jle Npos_1		# if so, goto Npos_1:
+0x07c: c0f00100000000000000 | 	iaddq $1, %rax		# count++
+0x086:                      | Npos_1:	
+0x086: 62bb                 | 	andq %r11, %r11		# val_2 <= 0?
+0x088: 719b00000000000000   | 	jle Npos_2		# if so, goto Npos_1:
+0x091: c0f00100000000000000 | 	iaddq $1, %rax
+0x09b:                      | Npos_2:
+0x09b: c0f2feffffffffffffff | 	iaddq $-2, %rdx		# len--
+0x0a5: c0f71000000000000000 | 	iaddq $16, %rdi		# src++
+0x0af: c0f61000000000000000 | 	iaddq $16, %rsi		# dst++
+0x0b9: 6222                 | 	andq %rdx,%rdx		# len > 0?
+0x0bb: 764900000000000000   | 	jg Loop_1			# if so, goto Loop:
+0x0c4:                      | Done_1:
+0x0c4: c0f20100000000000000 | 	iaddq $1, %rdx
+0x0ce: 6222                 | 	andq %rdx, %rdx
+0x0d0: 712b01000000000000   | 	jle Done
+0x0d9:                      | Loop_2:	
+0x0d9: 50a70000000000000000 | 	mrmovq (%rdi), %r10	# read val from src...
+0x0e3: 40a60000000000000000 | 	rmmovq %r10, (%rsi)	# ...and store it to dst
+0x0ed: 62aa                 | 	andq %r10, %r10		# val <= 0?
+0x0ef: 710201000000000000   | 	jle Npos_3		# if so, goto Npos:
+0x0f8: c0f00100000000000000 | 	iaddq $1, %rax		# count++
+0x102:                      | Npos_3:	
+0x102: c0f2ffffffffffffffff | 	iaddq $-1, %rdx		# len--
+0x10c: c0f70800000000000000 | 	iaddq $8, %rdi		# src++
+0x116: c0f60800000000000000 | 	iaddq $8, %rsi		# dst++
+0x120: 6222                 | 	andq %rdx,%rdx		# len > 0?
+0x122: 76d900000000000000   | 	jg Loop_2			# if so, goto Loop:
                             | ##################################################################
                             | # Do not modify the following section of code
                             | # Function epilogue.
-0x12d:                      | Done:
-0x12d: 90                   | 	ret
+0x12b:                      | Done:
+0x12b: 90                   | 	ret
                             | ##################################################################
                             | # Keep the following label at the end of your function
-0x12e:                      | End:
+0x12c:                      | End:
                             | #/* $end ncopy-ys */
-0x12e:                      | EndFun:
+0x12c:                      | EndFun:
                             | 
                             | ###############################
                             | # Source and destination blocks 
                             | ###############################
 0x130:                      | 	.align 8
 0x130:                      | src:
-0x130: 0100000000000000     | 	.quad 1
+0x130: ffffffffffffffff     | 	.quad -1
 0x138: 0200000000000000     | 	.quad 2
 0x140: fdffffffffffffff     | 	.quad -3
-0x148: fcffffffffffffff     | 	.quad -4
+0x148: 0400000000000000     | 	.quad 4
 0x150: fadebc0000000000     | 	.quad 0xbcdefa # This shouldn't get moved
                             | 
 0x160:                      | 	.align 16
